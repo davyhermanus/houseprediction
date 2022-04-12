@@ -1,9 +1,10 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: win-64
-scikit-learn==0.22.1
-matplotlib==3.2.2
-numpy==1.18.1
-pandas==1.0.5
-shap
-streamlit==0.62.0
+pip==21.2.2
+streamlit==1.8.1
+scikit-learn
+matplotlib==3.5.1
+numpy==1.21.5
+pandas==1.4.2
+shap==0.40.
