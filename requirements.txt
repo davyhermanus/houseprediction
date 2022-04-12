@@ -1,56 +1,7 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: win-64
-# absl-py=1.0.0=pypi_0
-argon2-cffi=21.3.0=pypi_0
-asttokens=2.0.5=pypi_0
-astunparse=1.6.3=pypi_0
-attrs=21.4.0=pypi_0
-backcall=0.2.0=pypi_0
-backports-zoneinfo=0.2.1=pypi_0
-beautifulsoup4=4.10.0=pypi_0
-bleach=4.1.0=pypi_0
-blinker=1.4=pypi_0
-boto3=1.21.37=pypi_0
-botocore=1.24.37=pypi_0
-ca-certificates=2022.3.29=haa95532_0
-cachetools=5.0.0=pypi_0
-certifi=2021.10.8=py38haa95532_2
-cffi=1.15.0=pypi_0
-charset-normalizer=2.0.12=pypi_0
-click=8.0.4=pypi_0
-cloudpickle=2.0.0=pypi_0
-colorama=0.4.4=pypi_0
-cycler=0.11.0=pypi_0
-debugpy=1.6.0=pypi_0
-decorator=5.1.1=pypi_0
-defusedxml=0.7.1=pypi_0
-docopt=0.6.2=pypi_0
-entrypoints=0.4=pypi_0
-executing=0.8.3=pypi_0
-filelock=3.6.0=pypi_0
-flatbuffers=2.0=pypi_0
-fonttools=4.31.2=pypi_0
-gast=0.5.3=pypi_0
-gitdb=4.0.9=pypi_0
-gitpython=3.1.27=pypi_0
-google-auth=2.6.2=pypi_0
-google-auth-oauthlib=0.4.6=pypi_0
-google-pasta=0.2.0=pypi_0
-grpcio=1.44.0=pypi_0
-h5py=3.6.0=pypi_0
-huggingface-hub=0.5.1=pypi_0
-idna=3.3=pypi_0
-importlib-metadata=4.11.3=pypi_0
-importlib-resources=5.6.0=pypi_0
-ipykernel=6.11.0=pypi_0
-ipython=8.2.0=pypi_0
-ipython-genutils=0.2.0=pypi_0
-ipywidgets=7.7.0=pypi_0
-jedi=0.18.1=pypi_0
-jinja2=3.1.1=pypi_0
-jmespath=1.0.0=pypi_0
-joblib=1.1.0=pypi_0
+
 jsonschema=4.4.0=pypi_0
 jupyter-client=7.2.1=pypi_0
 jupyter-core=4.9.2=pypi_0
