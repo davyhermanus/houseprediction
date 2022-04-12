@@ -1,10 +1,8 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: win-64
-absl-py=1.0.0=pypi_0
-altair=4.2.0=pypi_0
+# absl-py=1.0.0=pypi_0
 argon2-cffi=21.3.0=pypi_0
-argon2-cffi-bindings=21.2.0=pypi_0
 asttokens=2.0.5=pypi_0
 astunparse=1.6.3=pypi_0
 attrs=21.4.0=pypi_0
