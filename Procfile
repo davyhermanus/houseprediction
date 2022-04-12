@@ -1,0 +1,1 @@
+web: sh setup.sh && streamlit run Bandung_architechno_app.py
