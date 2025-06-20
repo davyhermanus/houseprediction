@@ -163,42 +163,43 @@ st.caption("This conclusion is based on your feature importance settings and his
 
 # --- Compatibility Ranking for All Houses ---
 
-# 1. Normalize preference
-pref_series = pd.Series(user_pref)
-pref_norm = pref_series / pref_series.sum()
+# Ensure preferences exist and valid
+if 'user_pref' in locals() and isinstance(user_pref, dict) and len(user_pref) == X.shape[1]:
 
-# 2. Scale the entire dataset
-X_all_scaled = scaler.transform(X)
+    # Normalize preference
+    pref_series = pd.Series(user_pref)
+    pref_norm = pref_series / pref_series.sum()
 
-# 3. Compute compatibility scores using dot product + sigmoid
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    # Compute compatibility scores
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
 
-compat_raw_scores = np.dot(X_all_scaled, pref_norm.values)
-compat_scores = sigmoid(compat_raw_scores)
+    X_all_scaled = scaler.transform(X)
+    compat_raw_scores = np.dot(X_all_scaled, pref_norm.values)
+    compat_scores = sigmoid(compat_raw_scores)
 
-# 4. Combine scores with original data
-ranked_houses_df = data.copy()
-ranked_houses_df['Compatibility_Score'] = compat_scores
-ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
+    # Combine with original data
+    ranked_houses_df = data.copy()
+    ranked_houses_df['Compatibility_Score'] = compat_scores
+    ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
+    ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
 
-# 5. Sort by score
-ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
+    # Show full table
+    st.subheader("🏘️ All Houses Ranked by Compatibility")
+    st.dataframe(ranked_houses_df.reset_index(drop=True), use_container_width=True)
 
-# 6. Display all results
-st.subheader("🏘️ All Houses Ranked by Compatibility")
-st.markdown("Below is a list of all houses in the dataset, ranked by how well they match your preferences.")
-st.dataframe(ranked_houses_df.reset_index(drop=True), use_container_width=True)
+    # Filter section
+    st.markdown("### 🔍 Filter Recommendations")
+    max_price = st.slider("💰 Max Price (Rp)", int(data['Price'].min()), int(data['Price'].max()), int(data['Price'].max()))
+    min_score = st.slider("⭐ Min Compatibility Score (%)", 0, 100, 70)
 
-# 7. Optional: Add filters
-st.markdown("### 🔍 Filter Recommendations")
-max_price = st.slider("💰 Max Price (Rp)", int(data['Price'].min()), int(data['Price'].max()), int(data['Price'].max()))
-min_score = st.slider("⭐ Min Compatibility Score (%)", 0, 100, 70)
+    filtered_df = ranked_houses_df[
+        (ranked_houses_df['Price'] <= max_price) &
+        (ranked_houses_df['Score (%)'] >= min_score)
+    ]
 
-filtered_df = ranked_houses_df[
-    (ranked_houses_df['Price'] <= max_price) &
-    (ranked_houses_df['Score (%)'] >= min_score)
-]
+    st.markdown("### ✅ Filtered Houses Based on Your Budget and Preference Score")
+    st.dataframe(filtered_df.reset_index(drop=True), use_container_width=True)
 
-st.markdown("### ✅ Filtered Houses Based on Your Budget and Preference Score")
-st.dataframe(filtered_df.reset_index(drop=True), use_container_width=True)
+else:
+    st.warning("⚠️ Preferences could not be applied correctly. Please review the input sliders.")
