@@ -163,43 +163,53 @@ st.caption("This conclusion is based on your feature importance settings and his
 
 # --- Compatibility Ranking for All Houses ---
 
-# Ensure preferences exist and valid
+# 1. Pastikan preferensi valid
 if 'user_pref' in locals() and isinstance(user_pref, dict) and len(user_pref) == X.shape[1]:
 
-    # Normalize preference
+    # 2. Normalisasi preferensi
     pref_series = pd.Series(user_pref)
     pref_norm = pref_series / pref_series.sum()
 
-    # Compute compatibility scores
-    def sigmoid(x):
-        return 1 / (1 + np.exp(-x))
-
+    # 3. Hitung skor kecocokan
+    def sigmoid(x): return 1 / (1 + np.exp(-x))
     X_all_scaled = scaler.transform(X)
-    compat_raw_scores = np.dot(X_all_scaled, pref_norm.values)
-    compat_scores = sigmoid(compat_raw_scores)
 
-    # Combine with original data
-    ranked_houses_df = data.copy()
-    ranked_houses_df['Compatibility_Score'] = compat_scores
-    ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
-    ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
+    # Pastikan dimensi sesuai
+    if X_all_scaled.shape[1] == len(pref_norm):
+        compat_raw_scores = np.dot(X_all_scaled, pref_norm.values)
+        compat_scores = sigmoid(compat_raw_scores)
 
-    # Show full table
-    st.subheader("🏘️ All Houses Ranked by Compatibility")
-    st.dataframe(ranked_houses_df.reset_index(drop=True))
+        # 4. Gabungkan ke dataset
+        ranked_houses_df = data.copy()
+        ranked_houses_df['Compatibility_Score'] = compat_scores
+        ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
+        ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
 
-    # Filter section
-    st.markdown("### 🔍 Filter Recommendations")
-    max_price = st.slider("💰 Max Price (Rp)", int(data['Price'].min()), int(data['Price'].max()), int(data['Price'].max()))
-    min_score = st.slider("⭐ Min Compatibility Score (%)", 0, 100, 70)
+        # 5. Cek data invalid
+        if ranked_houses_df.isnull().values.any():
+            st.warning("⚠️ Some values in the dataset are missing. Please check the data.")
+            st.write(ranked_houses_df.isnull().sum())
 
-    filtered_df = ranked_houses_df[
-        (ranked_houses_df['Price'] <= max_price) &
-        (ranked_houses_df['Score (%)'] >= min_score)
-    ]
+        # 6. Tampilkan data maksimum 100 baris
+        st.subheader("🏘️ Top Compatible Houses")
+        st.markdown("Showing the top 100 most compatible houses based on your preferences.")
+        st.dataframe(ranked_houses_df.reset_index(drop=True).head(100))
 
-    st.markdown("### ✅ Filtered Houses Based on Your Budget and Preference Score")
-    st.dataframe(filtered_df.reset_index(drop=True))
+        # 7. Filter interaktif
+        st.markdown("### 🔍 Filter Recommendations")
+        max_price = st.slider("💰 Max Price (Rp)", int(data['Price'].min()), int(data['Price'].max()), int(data['Price'].max()))
+        min_score = st.slider("⭐ Min Compatibility Score (%)", 0, 100, 70)
+
+        filtered_df = ranked_houses_df[
+            (ranked_houses_df['Price'] <= max_price) &
+            (ranked_houses_df['Score (%)'] >= min_score)
+        ]
+
+        st.markdown("### ✅ Filtered Houses Based on Your Budget and Preference Score")
+        st.dataframe(filtered_df.reset_index(drop=True).head(100))
+
+    else:
+        st.error("❌ Dimension mismatch between scaled features and preference weights.")
 
 else:
-    st.warning("⚠️ Preferences could not be applied correctly. Please review the input sliders.")
+    st.warning("⚠️ Preferences are not valid or incomplete. Please check the input sliders.")
