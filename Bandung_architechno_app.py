@@ -185,8 +185,20 @@ ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
 # 5. Sort by score
 ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
 
-# 6. Display in Streamlit
+# 6. Display all results
 st.subheader("🏘️ All Houses Ranked by Compatibility")
 st.markdown("Below is a list of all houses in the dataset, ranked by how well they match your preferences.")
 st.dataframe(ranked_houses_df.reset_index(drop=True), use_container_width=True)
 
+# 7. Optional: Add filters
+st.markdown("### 🔍 Filter Recommendations")
+max_price = st.slider("💰 Max Price (Rp)", int(data['Price'].min()), int(data['Price'].max()), int(data['Price'].max()))
+min_score = st.slider("⭐ Min Compatibility Score (%)", 0, 100, 70)
+
+filtered_df = ranked_houses_df[
+    (ranked_houses_df['Price'] <= max_price) &
+    (ranked_houses_df['Score (%)'] >= min_score)
+]
+
+st.markdown("### ✅ Filtered Houses Based on Your Budget and Preference Score")
+st.dataframe(filtered_df.reset_index(drop=True), use_container_width=True)
