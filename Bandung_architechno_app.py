@@ -160,3 +160,33 @@ if mismatched:
     st.markdown(f"**❌ Features that might not meet your expectations:** `{', '.join(mismatched)}`")
 
 st.caption("This conclusion is based on your feature importance settings and historical housing price trends.")
+
+# --- Compatibility Ranking for All Houses ---
+
+# 1. Normalize preference
+pref_series = pd.Series(user_pref)
+pref_norm = pref_series / pref_series.sum()
+
+# 2. Scale the entire dataset
+X_all_scaled = scaler.transform(X)
+
+# 3. Compute compatibility scores using dot product + sigmoid
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+compat_raw_scores = np.dot(X_all_scaled, pref_norm.values)
+compat_scores = sigmoid(compat_raw_scores)
+
+# 4. Combine scores with original data
+ranked_houses_df = data.copy()
+ranked_houses_df['Compatibility_Score'] = compat_scores
+ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
+
+# 5. Sort by score
+ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
+
+# 6. Display in Streamlit
+st.subheader("🏘️ All Houses Ranked by Compatibility")
+st.markdown("Below is a list of all houses in the dataset, ranked by how well they match your preferences.")
+st.dataframe(ranked_houses_df.reset_index(drop=True), use_container_width=True)
+
