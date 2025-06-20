@@ -111,25 +111,36 @@ st.write('### Model Performance (on test data):')
 y_pred = model.predict(X_test)
 
 # R-squared
-score = model.score(X_test, y_test)
-st.write(f'R-squared: {score:.2f}')
+st.write('### R-squared:')
+st.write(f'R-squared: {model.score(X_test, y_test):.2f}')
+st.write("R-squared measures how well the model explains the variation in the target variable. A value closer to 1 indicates a better model fit.")
 
 # Mean Absolute Error (MAE)
 mae = mean_absolute_error(y_test, y_pred)
+st.write('### Mean Absolute Error (MAE):')
 st.write(f'Mean Absolute Error (MAE): {mae:.2f}')
+st.write("MAE measures the average absolute difference between the predicted and actual prices. Lower MAE indicates better accuracy.")
 
 # Mean Squared Error (MSE)
 mse = mean_squared_error(y_test, y_pred)
+st.write('### Mean Squared Error (MSE):')
 st.write(f'Mean Squared Error (MSE): {mse:.2f}')
+st.write("MSE penalizes larger errors more heavily, as errors are squared. Smaller values indicate a better fit.")
 
 # Root Mean Squared Error (RMSE)
 rmse = np.sqrt(mse)
+st.write('### Root Mean Squared Error (RMSE):')
 st.write(f'Root Mean Squared Error (RMSE): {rmse:.2f}')
+st.write("RMSE is the square root of MSE and gives the error in the same units as the target variable, making it easier to interpret.")
 
 # Mean Absolute Percentage Error (MAPE)
 mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
+st.write('### Mean Absolute Percentage Error (MAPE):')
 st.write(f'Mean Absolute Percentage Error (MAPE): {mape:.2f}%')
+st.write("MAPE measures the average percentage error. Smaller values indicate more accurate predictions.")
 
 # Explained Variance Score
 evs = explained_variance_score(y_test, y_pred)
+st.write('### Explained Variance Score:')
 st.write(f'Explained Variance Score: {evs:.2f}')
+st.write("Explained Variance Score indicates how much of the target variable's variance is explained by the model. Higher values are better.")
