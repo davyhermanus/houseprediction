@@ -186,7 +186,7 @@ if 'user_pref' in locals() and isinstance(user_pref, dict) and len(user_pref) ==
 
     # Show full table
     st.subheader("🏘️ All Houses Ranked by Compatibility")
-    st.dataframe(ranked_houses_df.reset_index(drop=True), use_container_width=True)
+    st.dataframe(ranked_houses_df.reset_index(drop=True))
 
     # Filter section
     st.markdown("### 🔍 Filter Recommendations")
@@ -199,7 +199,7 @@ if 'user_pref' in locals() and isinstance(user_pref, dict) and len(user_pref) ==
     ]
 
     st.markdown("### ✅ Filtered Houses Based on Your Budget and Preference Score")
-    st.dataframe(filtered_df.reset_index(drop=True), use_container_width=True)
+    st.dataframe(filtered_df.reset_index(drop=True))
 
 else:
     st.warning("⚠️ Preferences could not be applied correctly. Please review the input sliders.")
