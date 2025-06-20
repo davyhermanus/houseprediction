@@ -87,10 +87,11 @@ model.fit(X_train, y_train)
 prediction = model.predict(user_input)
 
 # Format the predicted price into Rupiah (IDR)
-formatted_price = locale.currency(prediction[0], grouping=True)
+formatted_price = "Rp {:,.0f}".format(prediction[0])
 
 # Display predicted price
 st.write('### Predicted Price of the House: ', formatted_price)
+
 
 # Feature importance visualization
 st.write('### Feature Importance:')
