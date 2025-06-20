@@ -3,60 +3,110 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
+import seaborn as sns
+import locale
 
+# Set locale for Indonesian Rupiah (IDR)
+locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
+
+# Set the page title and layout
+st.set_page_config(page_title="Bandung Real Estate Price Prediction", layout="wide")
+
+# App title and description
 st.write("""
-# Bandung Real Estate Price Prediction App
-This app predicts the **Bandung Real Estate Price**!
+# Bandung Real Estate Price Prediction
+This app predicts the **Bandung Real Estate Price** based on several features. Simply adjust the sliders on the left to see the predicted price of a house.
 """)
 
 # Load dataset
-column_names = ['ARS', 'LKS', 'LT', 'LB', 'KT', 'KM', 'RT', 'DPR', 'KMN', 'ASR', 'RSK', 'UMR', 'BJR', 'HARGA']
-feature_names = ['ARS', 'LKS', 'LT', 'LB', 'KT', 'KM', 'RT', 'DPR', 'KMN', 'ASR', 'RSK', 'UMR', 'BJR']
-data = pd.read_csv(r'hargaprediksijualrumahnotitle.csv', header=None, delimiter=r"\s+", names=column_names)
-st.write('Dataset Source')
+column_names = ['Architecture', 'Location', 'Land_Area', 'Building_Area', 'Bedrooms', 'Bathrooms', 'Living_Room', 'Kitchen_Quality', 'Security', 'Greenness', 'Damage', 'House_Age', 'Flood_Risk', 'Price']
+feature_names = ['Architecture', 'Location', 'Land_Area', 'Building_Area', 'Bedrooms', 'Bathrooms', 'Living_Room', 'Kitchen_Quality', 'Security', 'Greenness', 'Damage', 'House_Age', 'Flood_Risk']
+data = pd.read_csv('hargaprediksijualrumahnotitle.csv', header=None, delimiter=r"\s+", names=column_names)
+st.write('Dataset Preview:')
 st.write(data.head())
 
-# Splitting features and target
+# Split features and target
 X = data[feature_names]
-Y = data['HARGA']
+Y = data['Price']
 
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
 # Sidebar for user input
-st.sidebar.header('Input Parameters')
+st.sidebar.header('Adjust Input Parameters')
 
 def user_input_features():
-    ARS = st.sidebar.slider('ASR - Bentuk Arsitektur', float(X.ARS.min()), float(X.ARS.max()), float(X.ARS.mean()))
-    LKS = st.sidebar.slider('LKS - Lokasi Potensial dari rumah', 1, 5, 1)
-    LT = st.sidebar.slider('LT - Luas Tanah dalam m2', float(X.LT.min()), float(X.LT.max()), float(X.LT.mean()))
-    LB = st.sidebar.slider('LB - Luas Bangunann dalam m2', float(X.LB.min()), float(X.LB.max()), float(X.LB.mean()))
-    KT = st.sidebar.slider('KT - Jumlah kamar Tidur', 3, 5, 1)
-    KM = st.sidebar.slider('KM - Jumlah kamar Mandi', 2, 4, 1)
-    RT = st.sidebar.slider('RT - Jumlah ruang besar', 1, 3, 1)
-    DPR = st.sidebar.slider('DPR - Tingkat kualitas Dapur', 1, 3, 1)
-    KMN = st.sidebar.slider('KMN - Tingkat keamanan rumah', 0, 3, 1)
-    ASR = st.sidebar.slider('ASR - Keasrian rumah', 0, 3)
-    RSK = st.sidebar.slider('RSK - Tingkat kerusakan rumah', 0, 5, 1)
-    UMR = st.sidebar.slider('UMR - Usia rumah (tahun)', 0, 10, 1)
-    BJR = st.sidebar.slider('BJR - Kerawanan banjir', 0, 4, 1)
+    # Adding interactive sliders for user input
+    Architecture = st.sidebar.slider('Architecture Quality (1-5)', 1, 5, 3)
+    Location = st.sidebar.slider('Location Potential (1-5)', 1, 5, 3)
+    Land_Area = st.sidebar.slider('Land Area (m²)', float(X.Land_Area.min()), float(X.Land_Area.max()), float(X.Land_Area.mean()))
+    Building_Area = st.sidebar.slider('Building Area (m²)', float(X.Building_Area.min()), float(X.Building_Area.max()), float(X.Building_Area.mean()))
+    Bedrooms = st.sidebar.slider('Number of Bedrooms', 1, 5, 3)
+    Bathrooms = st.sidebar.slider('Number of Bathrooms', 1, 5, 2)
+    Living_Room = st.sidebar.slider('Number of Living Rooms', 1, 3, 1)
+    Kitchen_Quality = st.sidebar.slider('Kitchen Quality (1-5)', 1, 5, 3)
+    Security = st.sidebar.slider('Security Level (1-3)', 1, 3, 2)
+    Greenness = st.sidebar.slider('Greenness of Area (1-3)', 1, 3, 2)
+    Damage = st.sidebar.slider('Damage Level (1-5)', 1, 5, 1)
+    House_Age = st.sidebar.slider('House Age (Years)', 0, 100, 10)
+    Flood_Risk = st.sidebar.slider('Flood Risk Level (1-4)', 1, 4, 1)
     
-    data = {'ARS': ARS, 'LKS': LKS, 'LT': LT, 'LB': LB, 'KT': KT, 'KM': KM, 'RT': RT, 'DPR': DPR, 'KMN': KMN, 'ASR': ASR, 'RSK': RSK, 'UMR': UMR, 'BJR': BJR}
-    features = pd.DataFrame(data, index=[0])
+    # Collecting user input into a dictionary
+    user_data = {
+        'Architecture': Architecture,
+        'Location': Location,
+        'Land_Area': Land_Area,
+        'Building_Area': Building_Area,
+        'Bedrooms': Bedrooms,
+        'Bathrooms': Bathrooms,
+        'Living_Room': Living_Room,
+        'Kitchen_Quality': Kitchen_Quality,
+        'Security': Security,
+        'Greenness': Greenness,
+        'Damage': Damage,
+        'House_Age': House_Age,
+        'Flood_Risk': Flood_Risk
+    }
+    
+    # Convert to DataFrame
+    features = pd.DataFrame(user_data, index=[0])
     return features
 
-df = user_input_features()
+# Get user input
+user_input = user_input_features()
 
-# Display user input features
-st.write('User Input Parameters:')
-st.write(df)
+# Display user input
+st.write('### Your Selected Features:')
+st.write(user_input)
 
-# Build the Random Forest model
+# Train the model and make predictions
 model = RandomForestRegressor()
 model.fit(X_train, y_train)
 
-# Make prediction
-prediction = model.predict(df)
+# Prediction
+prediction = model.predict(user_input)
 
-# Display the prediction
-st.write(f'Prediksi Harga Rumah: {prediction[0]:,.2f}')
+# Format the predicted price into Rupiah (IDR)
+formatted_price = locale.currency(prediction[0], grouping=True)
+
+# Display predicted price
+st.write('### Predicted Price of the House: ', formatted_price)
+
+# Feature importance visualization
+st.write('### Feature Importance:')
+importance = model.feature_importances_
+feature_importance = pd.DataFrame({
+    'Feature': feature_names,
+    'Importance': importance
+})
+feature_importance = feature_importance.sort_values(by='Importance', ascending=False)
+
+# Plot feature importance
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.barplot(x='Importance', y='Feature', data=feature_importance, ax=ax)
+st.pyplot(fig)
+
+# Model performance metrics
+st.write('### Model Performance (on test data):')
+score = model.score(X_test, y_test)
+st.write(f'R-squared: {score:.2f}')
