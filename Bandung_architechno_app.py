@@ -4,10 +4,6 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 import seaborn as sns
-import locale
-
-# Set locale for Indonesian Rupiah (IDR)
-locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
 
 # Set the page title and layout
 st.set_page_config(page_title="Bandung Real Estate Price Prediction", layout="wide")
@@ -86,7 +82,7 @@ model.fit(X_train, y_train)
 # Prediction
 prediction = model.predict(user_input)
 
-# Format the predicted price into Rupiah (IDR)
+# Manually format the predicted price into Rupiah (IDR) with thousands separators
 formatted_price = "Rp {:,.0f}".format(prediction[0])
 
 # Display predicted price
