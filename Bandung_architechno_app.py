@@ -1,6 +1,4 @@
-# Revised final version with corrected markdown rendering inside Streamlit loop
 
-full_final_code_corrected = """
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -146,11 +144,3 @@ for i in range(3):
     st.markdown(f"- **Bedrooms**: {house['Bedrooms']} | **Bathrooms**: {house['Bathrooms']}")
     st.markdown(f"- **Location Score**: {house['Location']} | **Security**: {house['Security'] / 0.3}")
     st.markdown(f"- **Size**: Land {house['Land_Area']} m², Building {house['Building_Area']} m²")
-"""
-
-# Save the corrected code to file
-with open("/mnt/data/final_streamlit_app_fixed.py", "w") as f:
-    f.write(full_final_code_corrected)
-
-"/mnt/data/final_streamlit_app_fixed.py is ready with full functionality"
-
