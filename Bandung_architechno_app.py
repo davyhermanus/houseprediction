@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -78,53 +77,3 @@ st.success(f"Rp {predicted_price:,.0f}")
 
 st.subheader("🧩 Compatibility Score")
 st.info(f"{compatibility_score * 100:.1f}% match")
-
-# Feature Importance
-st.subheader("📊 Feature Importance")
-importances = model.feature_importances_
-importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': importances}).sort_values(by="Importance", ascending=False)
-fig, ax = plt.subplots(figsize=(8, 5))
-sns.barplot(data=importance_df, x="Importance", y="Feature", ax=ax)
-st.pyplot(fig)
-
-# Metrics
-st.subheader("📈 Model Metrics")
-y_pred = model.predict(X_test)
-mae = mean_absolute_error(y_test, y_pred)
-mse = mean_squared_error(y_test, y_pred)
-rmse = np.sqrt(mse)
-r2 = model.score(X_test, y_test)
-mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
-evs = explained_variance_score(y_test, y_pred)
-st.markdown(f'''
-- **R² Score**: `{r2:.2f}` — Variance explained by model.
-- **MAE**: `Rp {mae:,.0f}` — Mean absolute error.
-- **RMSE**: `Rp {rmse:,.0f}` — Root of squared error.
-- **MAPE**: `{mape:.2f}%` — Mean percent error.
-- **Explained Variance**: `{evs:.2f}`
-''')
-
-# Final narrative
-st.subheader("📝 Final Assessment")
-price_level = "average"
-if predicted_price > y.mean() + y.std():
-    price_level = "high"
-elif predicted_price < y.mean() - y.std():
-    price_level = "low"
-
-match_level = "low"
-if compatibility_score > 0.8:
-    match_level = "strong"
-elif compatibility_score > 0.6:
-    match_level = "medium"
-
-if price_level == "high" and match_level == "strong":
-    msg = "💰 High price, but excellent match!"
-elif price_level == "low" and match_level == "strong":
-    msg = "🎉 Great match and affordable!"
-elif match_level == "low":
-    msg = "⚠️ May not align with your preferences."
-else:
-    msg = "📌 Reasonably priced, worth a look."
-
-st.info(msg)
