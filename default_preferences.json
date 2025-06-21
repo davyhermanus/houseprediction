@@ -1,9 +1,9 @@
 {
   "Architecture": 3,
-  "Location": 4,
+  "Location": 3,
   "Land_Area": 3,
   "Building_Area": 3,
-  "Bedrooms": 1,
+  "Bedrooms": 2,
   "Bathrooms": 1,
   "Living_Room": 3,
   "Kitchen_Quality": 4,
@@ -11,5 +11,5 @@
   "Greenness": 3,
   "Damage": 3,
   "House_Age": 5,
-  "Flood_Risk": 4
+  "Flood_Risk": 3
 }
