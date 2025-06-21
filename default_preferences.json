@@ -3,13 +3,13 @@
   "Location": 4,
   "Land_Area": 3,
   "Building_Area": 3,
-  "Bedrooms": 2,
-  "Bathrooms": 2,
+  "Bedrooms": 1,
+  "Bathrooms": 1,
   "Living_Room": 3,
-  "Kitchen_Quality": 2,
+  "Kitchen_Quality": 4,
   "Security": 3,
   "Greenness": 3,
-  "Damage": 4,
-  "House_Age": 4,
-  "Flood_Risk": 5
+  "Damage": 3,
+  "House_Age": 5,
+  "Flood_Risk": 4
 }
