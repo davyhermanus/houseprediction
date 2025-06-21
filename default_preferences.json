@@ -1,15 +1,15 @@
 {
-    "Architecture": 0.1258852611397341,
-    "Location": 0.1434980222080468,
-    "Land_Area": -0.08834435665111955,
-    "Building_Area": -0.08834435647552528,
-    "Bedrooms": 0.11072127000194981,
-    "Bathrooms": -0.07011244513188442,
-    "Living_Room": -0.0712290775844975,
-    "Kitchen_Quality": -0.07543610099583625,
-    "Security": -0.08400085457853568,
-    "Greenness": -0.004705356006455732,
-    "Damage": 2.8677420275814273e-07,
-    "House_Age": 0.13438280810799702,
-    "Flood_Risk": -0.0033398043442150137
+  "Architecture": 5,
+  "Location": 3,
+  "Land_Area": 2,
+  "Building_Area": 3,
+  "Bedrooms": 1,
+  "Bathrooms": 3,
+  "Living_Room": 3,
+  "Kitchen_Quality": 3,
+  "Security": 3,
+  "Greenness": 3,
+  "Damage": 2,
+  "House_Age": 2,
+  "Flood_Risk": 3
 }
