@@ -155,4 +155,3 @@ for i in range(3):
     st.markdown(f"- **Bedrooms**: {house['Bedrooms']} | **Bathrooms**: {house['Bathrooms']}")
     st.markdown(f"- **Location Score**: {house['Location']} | **Security**: {house['Security'] / 0.3:.0f}")
     st.markdown(f"- **Size**: Land {house['Land_Area']} m², Building {house['Building_Area']} m²")
-"""
