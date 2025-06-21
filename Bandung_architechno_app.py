@@ -57,8 +57,13 @@ user_pref = {
     key: st.sidebar.slider(f"{key} Importance", 1, 5, 3) for key in X.columns
 }
 pref_series = pd.Series(user_pref)
-pref_std = (pref_series - pref_series.mean()) / pref_series.std()
-pref_norm = pref_std / pref_std.abs().sum()
+
+# Safe normalization
+if pref_series.std() == 0:
+    pref_norm = pd.Series(1 / len(pref_series), index=pref_series.index)
+else:
+    pref_std = (pref_series - pref_series.mean()) / pref_series.std()
+    pref_norm = pref_std / pref_std.abs().sum()
 
 # Prediction
 user_scaled = scaler.transform(user_input)
