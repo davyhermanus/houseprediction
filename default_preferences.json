@@ -1,15 +1,15 @@
 {
-  "Architecture": 5,
-  "Location": 3,
-  "Land_Area": 2,
-  "Building_Area": 3,
-  "Bedrooms": 1,
-  "Bathrooms": 3,
+  "Architecture": 4,
+  "Location": 5,
+  "Land_Area": 3,
+  "Building_Area": 5,
+  "Bedrooms": 5,
+  "Bathrooms": 2,
   "Living_Room": 3,
   "Kitchen_Quality": 3,
   "Security": 3,
-  "Greenness": 3,
-  "Damage": 2,
-  "House_Age": 2,
-  "Flood_Risk": 3
+  "Greenness": 5,
+  "Damage": 4,
+  "House_Age": 3,
+  "Flood_Risk": 5
 }
