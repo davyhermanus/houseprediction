@@ -32,6 +32,7 @@ model = RandomForestRegressor(random_state=42)
 model.fit(X_train, y_train)
 
 # --- Streamlit UI ---
+st.set_page_config(page_title="Bandung House Prediction", layout="wide")
 st.title("🏠 Bandung House Price Prediction & Compatibility App")
 
 # User input
@@ -108,9 +109,9 @@ st.markdown(f"""
 
 # --- Final Narrative Assessment ---
 st.subheader("📝 Final Assessment")
-
 mean_price = y.mean()
 std_price = y.std()
+
 if predicted_price > mean_price + std_price:
     price_level = "high"
 elif predicted_price < mean_price - std_price:
@@ -137,7 +138,6 @@ for feature in X.columns:
     else:
         matched.append(feature)
 
-# Narrative generation
 if price_level == "high" and match_level == "strong":
     message = "💰 The house is relatively expensive, but it's a great match for your preferences."
 elif price_level == "high" and match_level == "low":
@@ -155,61 +155,43 @@ else:
 
 st.info(message)
 if matched:
-    st.markdown(f"**✅ Features that match your preferences:** `{', '.join(matched)}`")
+    st.markdown(f"**✅ Matches your preferences:** `{', '.join(matched)}`")
 if mismatched:
-    st.markdown(f"**❌ Features that might not meet your expectations:** `{', '.join(mismatched)}`")
+    st.markdown(f"**❌ May not meet expectations:** `{', '.join(mismatched)}`")
 
-st.caption("This conclusion is based on your feature importance settings and historical housing price trends.")
+st.caption("This result is based on your priorities and the historical housing dataset.")
 
-# --- Compatibility Ranking for All Houses ---
+# --- Compatibility Ranking ---
+pref_norm = pref_series / pref_series.sum()
+X_all_scaled = scaler.transform(X)
+compat_scores = sigmoid(np.dot(X_all_scaled, pref_norm.values))
 
-# 1. Pastikan preferensi valid
-if 'user_pref' in locals() and isinstance(user_pref, dict) and len(user_pref) == X.shape[1]:
+ranked_houses_df = data.copy()
+ranked_houses_df['Compatibility_Score'] = compat_scores
+ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
+ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
 
-    # 2. Normalisasi preferensi
-    pref_series = pd.Series(user_pref)
-    pref_norm = pref_series / pref_series.sum()
+# --- Hotel-like Cards ---
+st.subheader("🏡 Featured Recommended Houses")
+top_3 = ranked_houses_df.head(3).reset_index(drop=True)
 
-    # 3. Hitung skor kecocokan
-    def sigmoid(x): return 1 / (1 + np.exp(-x))
-    X_all_scaled = scaler.transform(X)
-
-    # Pastikan dimensi sesuai
-    if X_all_scaled.shape[1] == len(pref_norm):
-        compat_raw_scores = np.dot(X_all_scaled, pref_norm.values)
-        compat_scores = sigmoid(compat_raw_scores)
-
-        # 4. Gabungkan ke dataset
-        ranked_houses_df = data.copy()
-        ranked_houses_df['Compatibility_Score'] = compat_scores
-        ranked_houses_df['Score (%)'] = (compat_scores * 100).round(2)
-        ranked_houses_df = ranked_houses_df.sort_values(by="Compatibility_Score", ascending=False)
-
-        # 5. Cek data invalid
-        if ranked_houses_df.isnull().values.any():
-            st.warning("⚠️ Some values in the dataset are missing. Please check the data.")
-            st.write(ranked_houses_df.isnull().sum())
-
-        # 6. Tampilkan data maksimum 100 baris
-        st.subheader("🏘️ Top Compatible Houses")
-        st.markdown("Showing the top 100 most compatible houses based on your preferences.")
-        st.dataframe(ranked_houses_df.reset_index(drop=True).head(100))
-
-        # 7. Filter interaktif
-        st.markdown("### 🔍 Filter Recommendations")
-        max_price = st.slider("💰 Max Price (Rp)", int(data['Price'].min()), int(data['Price'].max()), int(data['Price'].max()))
-        min_score = st.slider("⭐ Min Compatibility Score (%)", 0, 100, 70)
-
-        filtered_df = ranked_houses_df[
-            (ranked_houses_df['Price'] <= max_price) &
-            (ranked_houses_df['Score (%)'] >= min_score)
-        ]
-
-        st.markdown("### ✅ Filtered Houses Based on Your Budget and Preference Score")
-        st.dataframe(filtered_df.reset_index(drop=True).head(100))
-
-    else:
-        st.error("❌ Dimension mismatch between scaled features and preference weights.")
-
-else:
-    st.warning("⚠️ Preferences are not valid or incomplete. Please check the input sliders.")
+for idx, row in top_3.iterrows():
+    st.markdown(
+        f"""
+        <div style="border:1px solid #ddd; border-radius:10px; padding:15px; margin-bottom:15px; background-color:#f9f9f9">
+            <h4>🏠 House #{idx+1}</h4>
+            <ul style="padding-left:20px">
+                <li><b>Architecture:</b> {row['Architecture']}</li>
+                <li><b>Location:</b> {row['Location']}</li>
+                <li><b>Land Area:</b> {row['Land_Area']} m²</li>
+                <li><b>Building Area:</b> {row['Building_Area']} m²</li>
+                <li><b>Bedrooms:</b> {row['Bedrooms']}</li>
+                <li><b>Bathrooms:</b> {row['Bathrooms']}</li>
+                <li><b>Security:</b> {row['Security']}</li>
+                <li><b>Compatibility Score:</b> {row['Score (%)']}%</li>
+                <li><b>Estimated Price:</b> Rp {int(row['Price']):,}</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
