@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -17,16 +16,17 @@ column_names = [
 ]
 data = pd.read_csv("hargaprediksijualrumahnotitle.csv", header=None, delim_whitespace=True, names=column_names)
 
+# Preprocess
 X = data.drop(columns=["Price"]).copy()
-X['Security'] *= 0.3
+X['Security'] *= 0.3  # Adjust weight
 y = data["Price"]
 
-# Scale
+# Scaling
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
 
-# Train model
+# Train/test split
 X_train, X_test, y_train, y_test = train_test_split(X_scaled_df, y, test_size=0.2, random_state=42)
 model = RandomForestRegressor(random_state=42)
 model.fit(X_train, y_train)
@@ -34,6 +34,7 @@ model.fit(X_train, y_train)
 # UI
 st.title("🏠 Bandung House Price Prediction & Compatibility App")
 
+# --- Sidebar Inputs ---
 st.sidebar.header("🏡 House Features")
 user_input = pd.DataFrame([{
     'Architecture': st.sidebar.slider('Architecture Score', 100, 200, 150),
@@ -51,27 +52,22 @@ user_input = pd.DataFrame([{
     'Flood_Risk': st.sidebar.slider('Flood Risk (0–4)', 0, 4, 1),
 }])
 
-# Preference
+# --- Preferences ---
 st.sidebar.header("🎯 Your Preferences")
 user_pref = {
     key: st.sidebar.slider(f"{key} Importance", 1, 5, 3) for key in X.columns
 }
 pref_series = pd.Series(user_pref)
+pref_std = (pref_series - pref_series.mean()) / pref_series.std()
+pref_norm = pref_std / pref_std.abs().sum()
 
-# Safe normalization
-if pref_series.std() == 0:
-    pref_norm = pd.Series(1 / len(pref_series), index=pref_series.index)
-else:
-    pref_std = (pref_series - pref_series.mean()) / pref_series.std()
-    pref_norm = pref_std / pref_std.abs().sum()
-
-# Prediction
+# --- Prediction ---
 user_scaled = scaler.transform(user_input)
 predicted_price = model.predict(user_scaled)[0]
 
-# Compatibility
+# --- Compatibility Score ---
 raw_score = np.dot(user_scaled[0], pref_norm)
-compatibility_score = 1 / (1 + np.exp(-raw_score))
+compatibility_score = 1 / (1 + np.exp(-raw_score)) if not np.isnan(raw_score) else 0
 
 st.subheader("💰 Predicted Price")
 st.success(f"Rp {predicted_price:,.0f}")
@@ -79,7 +75,7 @@ st.success(f"Rp {predicted_price:,.0f}")
 st.subheader("🧩 Compatibility Score")
 st.info(f"{compatibility_score * 100:.1f}% match")
 
-# Feature Importance
+# --- Feature Importance ---
 st.subheader("📊 Feature Importance")
 importances = model.feature_importances_
 importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': importances}).sort_values(by="Importance", ascending=False)
@@ -87,7 +83,7 @@ fig, ax = plt.subplots(figsize=(8, 5))
 sns.barplot(data=importance_df, x="Importance", y="Feature", ax=ax)
 st.pyplot(fig)
 
-# Model Metrics
+# --- Evaluation Metrics ---
 st.subheader("📈 Model Evaluation")
 y_pred = model.predict(X_test)
 mae = mean_absolute_error(y_test, y_pred)
@@ -97,32 +93,37 @@ r2 = model.score(X_test, y_test)
 mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
 evs = explained_variance_score(y_test, y_pred)
 
-st.markdown(f'''
-- **R² Score**: `{r2:.2f}` — Explains variance.
-- **MAE**: `Rp {mae:,.0f}` — Avg absolute error.
-- **MSE**: `Rp {mse:,.0f}` — Squared error.
-- **RMSE**: `Rp {rmse:,.0f}` — Root of MSE.
-- **MAPE**: `{mape:.2f}%` — Percentage error.
-- **Explained Variance Score**: `{evs:.2f}`
-''')
+st.markdown(f"""
+- **R² Score**: `{r2:.2f}` — Explains variance in prices.
+- **MAE**: `Rp {mae:,.0f}` — Average absolute error.
+- **MSE**: `Rp {mse:,.0f}` — Penalizes large errors.
+- **RMSE**: `Rp {rmse:,.0f}` — Root mean square error.
+- **MAPE**: `{mape:.2f}%` — Error relative to price.
+- **Explained Variance Score**: `{evs:.2f}` — Proportion of variance explained.
+""")
 
-# Final Narrative
+# --- Final Assessment ---
 st.subheader("📝 Final Assessment")
+
+# Determine price level
 mean_price = y.mean()
 std_price = y.std()
-
-price_level = "average"
 if predicted_price > mean_price + std_price:
     price_level = "high"
 elif predicted_price < mean_price - std_price:
     price_level = "low"
+else:
+    price_level = "average"
 
-match_level = "low"
+# Determine match level
 if compatibility_score > 0.8:
     match_level = "strong"
 elif compatibility_score > 0.6:
     match_level = "medium"
+else:
+    match_level = "low"
 
+# Generate narrative
 if price_level == "high" and match_level == "strong":
     msg = "💰 High price, but excellent match!"
 elif price_level == "low" and match_level == "strong":
@@ -134,16 +135,34 @@ else:
 
 st.info(msg)
 
-# Compatibility for all
+# Matched vs mismatched features
+matched, mismatched = [], []
+for feature in X.columns:
+    user_val = user_input[feature].values[0]
+    pref = pref_series[feature]
+    mean_val = X[feature].mean()
+    if pref >= 4 and user_val < mean_val:
+        mismatched.append(feature)
+    elif pref <= 2 and user_val > mean_val:
+        mismatched.append(feature)
+    else:
+        matched.append(feature)
+
+if matched:
+    st.markdown(f"✅ **Matched Preferences**: `{', '.join(matched)}`")
+if mismatched:
+    st.markdown(f"❌ **Less Aligned Features**: `{', '.join(mismatched)}`")
+
+# --- Recommendations ---
 X_all_scaled = scaler.transform(X)
 all_scores = 1 / (1 + np.exp(-np.dot(X_all_scaled, pref_norm)))
 data['Compatibility (%)'] = (all_scores * 100).round(2)
 df_sorted = data.sort_values(by='Compatibility (%)', ascending=False)
 
-st.subheader("🏘️ Recommended Houses")
+st.subheader("🏘️ Top Recommended Houses")
 for i in range(3):
     house = df_sorted.iloc[i]
-    st.markdown("#### 🏡 House #" + str(i + 1))
+    st.markdown(f"#### 🏡 House #{i + 1}")
     st.markdown(f"- **Price**: `Rp {house['Price']:,.0f}`")
     st.markdown(f"- **Compatibility**: `{house['Compatibility (%)']}%`")
     st.markdown(f"- **Bedrooms**: {house['Bedrooms']} | **Bathrooms**: {house['Bathrooms']}")
