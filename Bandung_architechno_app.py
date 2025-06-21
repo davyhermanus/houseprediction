@@ -138,3 +138,21 @@ st.markdown(f"""
 - **MAPE (Mean Absolute Percentage Error)**: `{mape:.2f}%` – Average prediction error in percentage.
 - **Explained Variance Score**: `{evs:.2f}` – Higher is better, closer to 1.
 """)
+
+# --- Compatibility for all houses ---
+X_all_scaled = scaler.transform(X)
+dot_products = np.dot(X_all_scaled, pref_norm.values)
+compat_scores = 1 / (1 + np.exp(-dot_products))
+data['Compatibility (%)'] = (compat_scores * 100).round(2)
+ranked_data = data.sort_values(by='Compatibility (%)', ascending=False)
+
+st.subheader("🏘️ Top House Recommendations")
+for i in range(3):
+    house = ranked_data.iloc[i]
+    st.markdown(f"### 🏡 House #{i+1}")
+    st.markdown(f"- **Price**: `Rp {house['Price']:,.0f}`")
+    st.markdown(f"- **Compatibility**: `{house['Compatibility (%)']}%`")
+    st.markdown(f"- **Bedrooms**: {house['Bedrooms']} | **Bathrooms**: {house['Bathrooms']}")
+    st.markdown(f"- **Location Score**: {house['Location']} | **Security**: {house['Security'] / 0.3:.0f}")
+    st.markdown(f"- **Size**: Land {house['Land_Area']} m², Building {house['Building_Area']} m²")
+"""
